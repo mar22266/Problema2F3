@@ -1,64 +1,127 @@
 #Problema  parcial 2
 #Andre Marroquin 
 #Nelson Garcia
+import pygame
+import sys
 import math
 
-# Constante de permitividad del vacío
-epsilon_0 = 8.854187817e-12  # (F/m)
+# Inicialización de Pygame
+pygame.init()
 
-def main():
-    print("Simulación de partícula cargada interactuando con una superficie cargada")
-    
-    # Solicitar al usuario el tipo de carga central (esfera o plano)
-    tipo_carga = input("Tipo de carga (esfera/plano): ").lower()
-    
-    if tipo_carga == "esfera":
-        radio = float(input("Radio de la esfera (metros): "))
-        carga_esfera = float(input("Carga de la esfera (Coulombs): "))
-        masa_particula = float(input("Masa de la partícula (kilogramos): "))
-        velocidad_inicial = float(input("Velocidad inicial de la partícula (m/s): "))
-        
-        distancia_maxima, velocidad_escape = calcular_distancia_maxima_esfera(radio, carga_esfera, masa_particula, velocidad_inicial)
-        
-    elif tipo_carga == "plano":
-        densidad_superficial = float(input("Densidad superficial de carga (Coulombs/m^2): "))
-        masa_particula = float(input("Masa de la partícula (kilogramos): "))
-        velocidad_inicial = float(input("Velocidad inicial de la partícula (m/s): "))
-        
-        distancia_maxima = calcular_distancia_maxima_plano(densidad_superficial, masa_particula, velocidad_inicial)
-        velocidad_escape = None  # No aplicable al plano
-    
-    else:
-        print("Tipo de carga no válido. Debe ser 'esfera' o 'plano'.")
-        return
+# Constantes físicas
+k = 8.99e9  # Constante de Coulomb
+c = 299792458  # Velocidad de la luz en el vacío (m/s)
 
-    # Comprobar si la esfera se ha convertido en un agujero negro electrostático
-    if distancia_maxima < 0:
+# Configuración de la ventana
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Simulación de Partícula y Carga")
+
+# Clase para representar la partícula
+class Particula:
+    def __init__(self, x, y, carga, velocidad):
+        self.x = x
+        self.y = y
+        self.carga = carga
+        self.velocidad = velocidad
+
+    def mover(self):
+        # Implementa el movimiento de la partícula según las fuerzas electrostáticas
+        pass
+
+    def dibujar(self):
+        # Dibuja la partícula en la pantalla
+        pygame.draw.circle(screen, (255, 0, 0), (int(self.x), int(self.y)), 10)
+
+# Clase para representar la carga (plano o esfera)
+class Carga:
+    def __init__(self, x, y, carga):
+        self.x = x
+        self.y = y
+        self.carga = carga
+
+    def fuerza_electrica(self, particula):
+        # Calcula la fuerza eléctrica entre la carga y la partícula
+        dx = particula.x - self.x
+        dy = particula.y - self.y
+        distancia = math.sqrt(dx ** 2 + dy ** 2)
+        fuerza = (k * particula.carga * self.carga) / distancia ** 2
+        angulo = math.atan2(dy, dx)
+        fx = fuerza * math.cos(angulo)
+        fy = fuerza * math.sin(angulo)
+        return fx, fy
+
+    def dibujar(self):
+        # Dibuja la carga en la pantalla
+        pygame.draw.circle(screen, (0, 0, 255), (int(self.x), int(self.y)), 20)
+
+# Función para calcular la distancia de máximo alejamiento
+def distancia_maxima(particula, carga):
+    distancia_maxima = 0
+    while True:
+        fx, fy = carga.fuerza_electrica(particula)
+        particula.x += particula.velocidad
+        particula.y -= fy
+        distancia = math.sqrt((particula.x - carga.x) ** 2 + (particula.y - carga.y) ** 2)
+        if distancia > distancia_maxima:
+            distancia_maxima = distancia
+        if distancia < 20:
+            return distancia_maxima
+
+# Entrada de parámetros
+tipo_carga = input("Tipo de carga (esfera o plano): ")
+radio = 0
+carga = 0
+densidad_superficial = 0
+
+if tipo_carga == "esfera":
+    radio = float(input("Radio de la esfera (m): "))
+    carga = float(input("Carga distribuida homogéneamente en la esfera (Coulombs): "))
+elif tipo_carga == "plano":
+    densidad_superficial = float(input("Densidad superficial de carga en el plano (C/m^2): "))
+
+carga_particula = float(input("Carga de la partícula (Coulombs): "))
+masa_particula = float(input("Masa de la partícula (kg): "))
+rapidez_inicial = float(input("Rapidez inicial de la partícula (m/s): "))
+
+# Inicialización de la partícula y la carga
+particula = Particula(100, 100, carga_particula, rapidez_inicial)
+carga = Carga(400, 300, carga)
+
+# Cálculo de la distancia de máximo alejamiento
+distancia_max = distancia_maxima(particula, carga)
+print("Distancia de máximo alejamiento: {:.2f} metros".format(distancia_max))
+
+# Verificación de velocidad de escape
+velocidad_escape = math.sqrt((2 * k * abs(carga.carga)) / carga_particula)
+if rapidez_inicial >= velocidad_escape:
+    print("La partícula ha alcanzado la velocidad de escape.")
+else:
+    print("La partícula no ha alcanzado la velocidad de escape.")
+    if carga.carga < 0 and carga_particula > velocidad_escape:
         print("La esfera se ha convertido en un agujero negro electrostático.")
-    else:
-        print(f"Distancia máxima de alejamiento: {distancia_maxima} metros")
-    
-    if velocidad_escape is not None:
-        print(f"Velocidad de escape: {velocidad_escape} m/s")
 
-def calcular_distancia_maxima_esfera(radio, carga_esfera, masa_particula, velocidad_inicial):
-    # Cálculo de la velocidad de escape
-    velocidad_escape = math.sqrt(2 * carga_esfera / (4 * math.pi * epsilon_0 * radio * masa_particula))
-    
-    # Comprobar si la velocidad inicial excede la velocidad de la luz en el vacío
-    if velocidad_inicial > 299792458:
-        return -1, velocidad_escape  # La partícula no puede superar la velocidad de la luz
-    
-    # Cálculo de la distancia máxima de alejamiento
-    distancia_maxima = (masa_particula * velocidad_inicial ** 2) / (2 * carga_esfera / (4 * math.pi * epsilon_0 * radio))
-    
-    return distancia_maxima, velocidad_escape
+# Bucle principal
+clock = pygame.time.Clock()
 
-def calcular_distancia_maxima_plano(densidad_superficial, masa_particula, velocidad_inicial):
-    # Cálculo de la distancia máxima de alejamiento en el caso del plano
-    distancia_maxima = (masa_particula * velocidad_inicial ** 2) / (2 * densidad_superficial)
-    
-    return distancia_maxima
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
-if __name__ == "__main__":
-    main()
+    # Calcula la fuerza eléctrica y mueve la partícula
+    fx, fy = carga.fuerza_electrica(particula)
+    particula.x += particula.velocidad
+    particula.y -= fy
+
+    # Limpia la pantalla
+    screen.fill((255, 255, 255))
+
+    # Dibuja la carga y la partícula
+    carga.dibujar()
+    particula.dibujar()
+
+    pygame.display.update()
+    clock.tick(60)
