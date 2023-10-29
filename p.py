@@ -1,15 +1,18 @@
-#interfaz grafica del programa
 import tkinter as tk
-from tkinter import ttk
 import math
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+class Particle:
+    def __init__(self):
+        self.x = []
+        self.y = []
 
 class PROGRAM(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Simulador de Partículas Cargadas")
-        self.geometry("600x400")
+        self.geometry("800x600")
 
         self.label1 = tk.Label(self, text="Bienvenido al programa de simulación de partículas cargadas.", font=("Times new roman", 16))
         self.label1.pack(pady=10)
@@ -23,28 +26,27 @@ class PROGRAM(tk.Tk):
         self.button_sphere = tk.Button(self, text="Esfera", command=self.open_sphere_screen, font=("Times new roman", 16))
         self.button_sphere.pack(pady=10)
 
+        self.particle = Particle()
+
     def open_infinite_plane_screen(self):
         self.withdraw()
-        InfinitePlaneScreen(self)
+        self.infinite_plane_screen = InfinitePlaneScreen(self)
 
     def open_sphere_screen(self):
         self.withdraw()
-        SphereScreen(self)
-        
-    def on_closing(self):        
-        self.destroy()
-        
+        self.sphere_screen = SphereScreen(self)
 
 class DataEntryFrame(tk.Frame):
-    def __init__(self, parent, title, tipo):
+    def __init__(self, parent, title, tipo, particle):
         super().__init__(parent)
+        self.particle = particle
         self.pack(side=tk.LEFT, padx=20, pady=20)
 
         label = tk.Label(self, text=title, font=("Times new roman", 16))
         label.pack()
 
         if tipo == "Plano":
-            self.label3= tk.Label(self, text="Densidad superficial de carga (nC/m)", font=("Times new roman", 14))
+            self.label3 = tk.Label(self, text="Densidad superficial de carga (nC/m)", font=("Times new roman", 14))
             self.label3.pack()
             self.densidad = tk.Entry(self, font=("Times new roman", 14))
             self.densidad.pack()
@@ -88,7 +90,6 @@ class DataEntryFrame(tk.Frame):
             self.result_label_es = tk.Label(self, text="", font=("Times new roman", 14), fg="green")
             self.result_label_es.pack(pady=10)
 
-
     def calcular_distancia(self, tipo):
         masa = float(self.masa.get())
         velocidad = float(self.velocidad.get())
@@ -110,16 +111,21 @@ class DataEntryFrame(tk.Frame):
                 result_velescape = 0.0
                 result_dismax = 0.0
                 result_velescape = math.sqrt((masa * carga * carga_esfera) / (math.pi * 2 * epsilon_0 * distancia))
-                result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
+                result_dismax = (2 * math.pi * distancia**2 * epsilon_0 * velocidad**2) / (carga * carga_esfera)
 
-                if result_velescape >= c:
-                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+                if result_velescape > c:
+                    self.result_label_v.config(
+                        text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+                else:
+                    self.result_label_v.config(
+                        text=f"Velocidad de escape de la partícula: {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
 
-                else: 
-                    self.result_label_v.config(text=f"Velocidad de escape de la partícula: {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+                # Graficar la trayectoria de la partícula
+                self.particle.x = [i for i in range(10)]  # Simulación de coordenadas x (tiempo)
+                self.particle.y = [velocidad * t for t in self.particle.x]  # Simulación de coordenadas y (distancia recorrida)
 
-
-
+                if self.particle.x and self.particle.y:
+                    self.parent.plot_trajectory(self.particle.x, self.particle.y)
 
 class InfinitePlaneScreen(tk.Tk):
     def __init__(self, parent):
@@ -128,17 +134,17 @@ class InfinitePlaneScreen(tk.Tk):
         self.title("Plano Infinito - Datos de Simulación")
         self.geometry("1080x900")
 
-        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Plano")
+        self.data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Plano", parent.particle)
 
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, padx=20, pady=20)
+
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-    def on_closing(self):        
+    def on_closing(self):
         self.destroy()
         self.parent.deiconify()
-
 
 class SphereScreen(tk.Tk):
     def __init__(self, parent):
@@ -147,18 +153,17 @@ class SphereScreen(tk.Tk):
         self.title("Esfera - Datos de Simulación")
         self.geometry("1080x900")
 
-        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Esfera")
-        
+        self.data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Esfera", parent.particle)
+
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, padx=20, pady=20)
+
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-    
-    def on_closing(self):        
+
+    def on_closing(self):
         self.destroy()
         self.parent.deiconify()
-
-
 
 if __name__ == "__main__":
     correr = PROGRAM()
