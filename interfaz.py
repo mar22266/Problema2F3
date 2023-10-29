@@ -113,7 +113,7 @@ class DataEntryFrame(tk.Frame):
                 result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
 
                 if result_velescape > c:
-                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s")
+                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
 
                 else: 
                     self.result_label_v.config(text=f"Velocidad de escape de la partícula: {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
