@@ -1,8 +1,7 @@
 #interfaz grafica del programa
-
 import tkinter as tk
 from tkinter import ttk
-
+import math
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -91,12 +90,34 @@ class DataEntryFrame(tk.Frame):
 
 
     def calcular_distancia(self, tipo):
+        masa = float(self.masa.get())
+        velocidad = float(self.velocidad.get())
+        carga = float(self.carga.get())
+        epsilon_0 = 8.854187817e-12  # Valor de la permitividad eléctrica del vacío en F/m
+        c = 299792458  # Velocidad de la luz en el vacío (m/s)
 
-        self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: (m)")
+        if velocidad > c:
+            self.result_label.config(text="Error: La velocidad no puede ser mayor que la velocidad de la luz.")
+        else:
+            if tipo == "Plano":
+                densidad = float(self.densidad.get())
+                result = (epsilon_0 * masa * velocidad**2) / (carga * densidad)
+                self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: {result} m")
 
-        if tipo == "Esfera":
-            self.result_label_v.config(text=f"Velocidad de escape de la partícula: (m/s)")
-            self.result_label_es.config(text=f"La esfera se ha convertido en un agujero negro electrostático.")
+            elif tipo == "Esfera":
+                distancia = float(self.distancia.get())
+                carga_esfera = float(self.carga_esfera.get())
+                result_velescape = 0.0
+                result_dismax = 0.0
+                result_velescape = math.sqrt((masa * carga * carga_esfera) / (math.pi * 2 * epsilon_0 * distancia))
+                result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
+
+                if result_velescape > c:
+                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s")
+
+                else: 
+                    self.result_label_v.config(text=f"Velocidad de escape de la partícula: {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+
 
 
 
