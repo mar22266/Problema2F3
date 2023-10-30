@@ -4,6 +4,8 @@ from tkinter import ttk
 import math
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.pyplot import scatter
+import numpy as np
 
 class PROGRAM(tk.Tk):
     def __init__(self):
@@ -36,10 +38,11 @@ class PROGRAM(tk.Tk):
         
 
 class DataEntryFrame(tk.Frame):
-    def __init__(self, parent, title, tipo):
+    def __init__(self, parent, title, tipo, ax, canvas):
         super().__init__(parent)
         self.pack(side=tk.LEFT, padx=20, pady=20)
-
+        self.ax = ax
+        self.canvas = canvas
         label = tk.Label(self, text=title, font=("Times new roman", 16))
         label.pack()
 
@@ -99,10 +102,12 @@ class DataEntryFrame(tk.Frame):
         if velocidad > c:
             self.result_label.config(text="Error: La velocidad no puede ser mayor que la velocidad de la luz.")
         else:
+            self.result_label.config(text=" ")
             if tipo == "Plano":
                 densidad = float(self.densidad.get())
                 result = (epsilon_0 * masa * velocidad**2) / (carga * densidad)
-                self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: {result} m")
+                self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: \n {result} m")
+                self.graficar_figura(tipo, result, 0)
 
             elif tipo == "Esfera":
                 distancia = float(self.distancia.get())
@@ -111,29 +116,58 @@ class DataEntryFrame(tk.Frame):
                 result_dismax = 0.0
                 result_velescape = math.sqrt((masa * carga * carga_esfera) / (math.pi * 2 * epsilon_0 * distancia))
                 result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
+                self.graficar_figura(tipo, result_dismax, distancia)
 
                 if result_velescape >= c:
-                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
 
                 else: 
-                    self.result_label_v.config(text=f"Velocidad de escape de la partícula: {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula: {result_dismax} m")
+                    self.result_label_v.config(text=f"Velocidad de escape de la partícula:\n {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
 
+    
+    def graficar_figura(self, tipo, distancia, radio):
+        self.ax.clear()
+        punto_x = 0
+        punto_y = 0
 
+        self.ax.set_xlabel("X (m)")
+        self.ax.set_ylabel("Y (m)")
+        self.ax.set_title("Distancia máxima de alejamiento de una partícula.")
 
+        if tipo == "Plano":
+            self.ax.axhline(y=0, color='blue', linestyle='--', label='Plano Infinito')
+            self.ax.legend()
+            scatter(punto_x , punto_y + distancia, color='green', marker='o', label='Partícula')
+            self.canvas.draw()
+        elif tipo == "Esfera":
+            phi = np.linspace(0, np.pi, 100)
+            theta = np.linspace(0, 2 * np.pi, 100)
+            phi, theta = np.meshgrid(phi, theta)
+            x = radio * np.sin(phi) * np.cos(theta)
+            y = radio * np.sin(phi) * np.sin(theta)
+
+            self.ax.plot(x, y, color='red')
+            self.ax.fill(x, y, 'red', alpha=0.2)
+            self.ax.axhline(y=radio, color='red', linestyle='--', label='')
+            self.ax.set_aspect('equal')  
+            self.ax.legend()
+            scatter(punto_x, punto_y + radio + distancia, color='green', marker='o', label='Partícula')
+            self.canvas.draw()
+        
 
 class InfinitePlaneScreen(tk.Tk):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.title("Plano Infinito - Datos de Simulación")
-        self.geometry("1080x900")
+        self.geometry("1100x900")
 
-        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Plano")
-
-        self.figure, self.ax = plt.subplots()
+        self.figure, self.ax = plt.subplots(figsize=(7, 9))
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, padx=20, pady=20)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Plano", self.ax, self.canvas)
 
     def on_closing(self):        
         self.destroy()
@@ -145,19 +179,18 @@ class SphereScreen(tk.Tk):
         super().__init__()
         self.parent = parent
         self.title("Esfera - Datos de Simulación")
-        self.geometry("1080x900")
+        self.geometry("1100x900")
 
-        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Esfera")
-        
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, padx=20, pady=20)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-    
+
+        data_entry_frame = DataEntryFrame(self, "Por favor ingrese los datos solicitados a continuación:", "Esfera", self.ax, self.canvas)
+        
     def on_closing(self):        
         self.destroy()
         self.parent.deiconify()
-
 
 
 if __name__ == "__main__":
