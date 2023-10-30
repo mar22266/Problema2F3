@@ -133,7 +133,7 @@ class DataEntryFrame(tk.Frame):
             distancia_ = self.distancia.get()
             carga_esfera_ = self.carga_esfera.get()
 
-        epsilon_0 = 8.854187817e-12  # Valor de la permitividad eléctrica del vacío en F/m
+        epsilon_0 = 8.85e-12  # Valor de la permitividad eléctrica del vacío en F/m
         c = 299792458  # Velocidad de la luz en el vacío (m/s)
         masa = 0.0
         carga = 0.0
