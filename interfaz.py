@@ -119,7 +119,7 @@ class DataEntryFrame(tk.Frame):
                 self.graficar_figura(tipo, result_dismax, distancia)
 
                 if result_velescape >= c:
-                    self.result_label_v.config(text=f"La esfera se ha convertido en un AGUJERO NEGRO ELECTROSTÁTICO, su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
+                    self.result_label_v.config(text=f"La esfera se ha convertido en un\n AGUJERO NEGRO ELECTROSTÁTICO,\n su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
 
                 else: 
                     self.result_label_v.config(text=f"Velocidad de escape de la partícula:\n {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
@@ -145,11 +145,9 @@ class DataEntryFrame(tk.Frame):
             phi, theta = np.meshgrid(phi, theta)
             x = radio * np.sin(phi) * np.cos(theta)
             y = radio * np.sin(phi) * np.sin(theta)
-
             self.ax.plot(x, y, color='red')
             self.ax.fill(x, y, 'red', alpha=0.2)
             self.ax.axhline(y=radio, color='red', linestyle='--', label='')
-            self.ax.set_aspect('equal')  
             self.ax.legend()
             scatter(punto_x, punto_y + radio + distancia, color='green', marker='o', label='Partícula')
             self.canvas.draw()
@@ -181,7 +179,7 @@ class SphereScreen(tk.Tk):
         self.title("Esfera - Datos de Simulación")
         self.geometry("1100x900")
 
-        self.figure, self.ax = plt.subplots()
+        self.figure, self.ax = plt.subplots(figsize=(7, 9))
         self.canvas = FigureCanvasTkAgg(self.figure, self)
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, padx=20, pady=20)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
