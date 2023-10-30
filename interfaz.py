@@ -1,4 +1,7 @@
 #interfaz grafica del programa
+#Andre Marroquin
+#Nelson Garcia
+#Problema 5 parcial 2 fisica 3
 import tkinter as tk
 from tkinter import ttk
 import math
