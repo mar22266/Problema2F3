@@ -4,7 +4,7 @@ from tkinter import ttk
 import math
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.pyplot import scatter
+from matplotlib.pyplot import scatter 
 import numpy as np
 
 class PROGRAM(tk.Tk):
@@ -43,62 +43,105 @@ class DataEntryFrame(tk.Frame):
         self.pack(side=tk.LEFT, padx=20, pady=20)
         self.ax = ax
         self.canvas = canvas
-        label = tk.Label(self, text=title, font=("Times new roman", 16))
+        label = tk.Label(self, text=title, font=("Times new roman", 14))
         label.pack()
 
+        self.label_par = tk.Label(self, text="Seleccione la partícula:", font=("Times new roman", 13))
+        self.label_par.pack()
+
+        self.varpar = tk.StringVar(self)
+        self.varpar.trace("w", self.update_var_par)
+        self.personalizada_button = ttk.Radiobutton(self, text="Personalizada", variable=self.varpar, value="Personalizada", command=self.update_var_par)
+        self.personalizada_button.pack()
+
+        self.protón_button = ttk.Radiobutton(self, text="Protón", variable=self.varpar, value="Protón", command=self.update_var_par)
+        self.protón_button.pack()
+
+        self.alfa_button = ttk.Radiobutton(self, text="Alfa", variable=self.varpar, value="Alfa", command=self.update_var_par)
+        self.alfa_button.pack()
+
+        self.litio_button = ttk.Radiobutton(self, text="Nucleo de Litio", variable=self.varpar, value="Litio", command=self.update_var_par)
+        self.litio_button.pack()
+
+        self.berilio_button = ttk.Radiobutton(self, text="Nucleo de Berilio", variable=self.varpar, value="Berilio", command=self.update_var_par)
+        self.berilio_button.pack()
+
+        self.carbono_button = ttk.Radiobutton(self, text="Nucleo de Carbono", variable=self.varpar, value="Carbono", command=self.update_var_par)
+        self.carbono_button.pack()
+
+        #self.result_label_par = tk.Label(self, text="", font=("Times new roman", 13), fg="green")
+        #self.result_label_par.pack(pady=5)
+
         if tipo == "Plano":
-            self.label3= tk.Label(self, text="Densidad superficial de carga (nC/m)", font=("Times new roman", 14))
+            self.label3= tk.Label(self, text="Densidad superficial de carga (nC/m)", font=("Times new roman", 12))
             self.label3.pack()
-            self.densidad = tk.Entry(self, font=("Times new roman", 14))
+            self.densidad = tk.Entry(self, font=("Times new roman", 12))
             self.densidad.pack()
         elif tipo == "Esfera":
-            self.label3 = tk.Label(self, text="Radio de la esfera (m)", font=("Times new roman", 14))
+            self.label3 = tk.Label(self, text="Radio de la esfera (m)", font=("Times new roman", 12))
             self.label3.pack()
-            self.distancia = tk.Entry(self, font=("Times new roman", 14))
+            self.distancia = tk.Entry(self, font=("Times new roman", 12))
             self.distancia.pack()
 
-            self.label4 = tk.Label(self, text="Carga de la esfera (nC)", font=("Times new roman", 14))
+            self.label4 = tk.Label(self, text="Carga de la esfera (nC)", font=("Times new roman", 12))
             self.label4.pack()
-            self.carga_esfera = tk.Entry(self, font=("Times new roman", 14))
-            self.carga_esfera.pack()
+            self.carga_esfera = tk.Entry(self, font=("Times new roman", 12))
+            self.carga_esfera.pack()        
 
-        self.label4 = tk.Label(self, text="Datos de la partícula:", font=("Times new roman", 16))
+        self.label4 = tk.Label(self, text="Datos de la partícula:", font=("Times new roman", 12))
         self.label4.pack()
 
-        self.label5 = tk.Label(self, text="Carga (nC)", font=("Times new roman", 14))
+        self.label5 = tk.Label(self, text="Carga (nC)", font=("Times new roman", 12))
         self.label5.pack()
-        self.carga = tk.Entry(self, font=("Times new roman", 14))
+        self.carga = tk.Entry(self, font=("Times new roman", 12))
         self.carga.pack()
 
-        self.label6 = tk.Label(self, text="Velocidad inicial (m/s)", font=("Times new roman", 14))
+        self.label6 = tk.Label(self, text="Velocidad inicial (m/s)", font=("Times new roman", 12))
         self.label6.pack()
-        self.velocidad = tk.Entry(self, font=("Times new roman", 14))
+        self.velocidad = tk.Entry(self, font=("Times new roman", 12))
         self.velocidad.pack()
 
-        self.label7 = tk.Label(self, text="Masa (kg)", font=("Times new roman", 14))
+        self.label7 = tk.Label(self, text="Masa (kg)", font=("Times new roman", 12))
         self.label7.pack()
-        self.masa = tk.Entry(self, font=("Times new roman", 14))
+        self.masa = tk.Entry(self, font=("Times new roman", 12))
         self.masa.pack()
 
-        self.calculate_button = tk.Button(self, text="Calcular", command=lambda: self.calcular_distancia(tipo), font=("Times new roman", 14))
-        self.calculate_button.pack(pady=10)
-        self.result_label = tk.Label(self, text="", font=("Times new roman", 14), fg="green")
+        self.calculate_button = tk.Button(self, text="Calcular", command=lambda: self.calcular_distancia(tipo), font=("Times new roman", 10))
+        self.calculate_button.pack(pady=10)        
+
+        self.result_label = tk.Label(self, text="", font=("Times new roman", 12), fg="green")
         self.result_label.pack(pady=10)
 
-        if tipo == "Esfera":
-            self.result_label_v = tk.Label(self, text="", font=("Times new roman", 14), fg="green")
-            self.result_label_v.pack(pady=10)
-            self.result_label_es = tk.Label(self, text="", font=("Times new roman", 14), fg="green")
-            self.result_label_es.pack(pady=10)
-
+    def update_var_par(self, *args):
+        # Este método se activará cuando se seleccione una opción en el Combobox
+        selected_option = self.varpar.get()
+        print(f"Opción seleccionada: {selected_option}")
+            
 
     def calcular_distancia(self, tipo):
-        masa = float(self.masa.get())
+        par_tipo = self.varpar.get()
+        masa_ = float(self.masa.get())
         velocidad = float(self.velocidad.get())
-        carga = float(self.carga.get())
+        carga_ = float(self.carga.get())
         epsilon_0 = 8.854187817e-12  # Valor de la permitividad eléctrica del vacío en F/m
         c = 299792458  # Velocidad de la luz en el vacío (m/s)
+        masa = 0.0
+        carga = 0.0
+        m_p = 1.672621637e-27
+        m_n = 1.674927211e-27
+        c_p = 1.6021764872e-19
 
+        lista_particulas = ["Personalizada","Protón", "Alfa", "Litio", "Berilio", "Carbono"]
+        #carga y masa de las particulas
+        lista_valores = [[carga_, masa_], [c_p, m_p],[2*c_p, (2*m_n+2*m_p)] ,[3*c_p,(4*m_n+3*m_p)], [4*c_p,(5*m_n+4*m_p)], [6*c_p,(6*m_n+6*m_p)] ]
+
+        #self.result_label_par.config(text=f"Partícula: {par_tipo}")
+
+        for i in range(len(lista_particulas)):
+            if par_tipo == lista_particulas[i]:
+                carga = lista_valores[i][0]
+                masa = lista_valores[i][1]
+        
         if velocidad > c:
             self.result_label.config(text="Error: La velocidad no puede ser mayor que la velocidad de la luz.")
         else:
@@ -119,10 +162,10 @@ class DataEntryFrame(tk.Frame):
                 self.graficar_figura(tipo, result_dismax, distancia)
 
                 if result_velescape >= c:
-                    self.result_label_v.config(text=f"La esfera se ha convertido en un\n AGUJERO NEGRO ELECTROSTÁTICO,\n su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
+                    self.result_label.config(text=f"La esfera se ha convertido en un\n AGUJERO NEGRO ELECTROSTÁTICO,\n su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
 
                 else: 
-                    self.result_label_v.config(text=f"Velocidad de escape de la partícula:\n {result_velescape} m/s\nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
+                    self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula:\n {result_dismax} m\nVelocidad de escape de la partícula:\n {result_velescape} m/s")
 
     
     def graficar_figura(self, tipo, distancia, radio):
