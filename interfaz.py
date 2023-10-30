@@ -120,9 +120,16 @@ class DataEntryFrame(tk.Frame):
 
     def calcular_distancia(self, tipo):
         par_tipo = self.varpar.get()
-        masa_ = float(self.masa.get())
-        velocidad = float(self.velocidad.get())
-        carga_ = float(self.carga.get())
+        masa_ = self.masa.get()
+        velocidad = self.velocidad.get()
+        carga_ = self.carga.get()
+
+        if tipo == "Plano":
+            densidad_ = self.densidad.get()
+        elif tipo == "Esfera":
+            distancia_ = self.distancia.get()
+            carga_esfera_ = self.carga_esfera.get()
+
         epsilon_0 = 8.854187817e-12  # Valor de la permitividad eléctrica del vacío en F/m
         c = 299792458  # Velocidad de la luz en el vacío (m/s)
         masa = 0.0
@@ -141,32 +148,89 @@ class DataEntryFrame(tk.Frame):
             if par_tipo == lista_particulas[i]:
                 carga = lista_valores[i][0]
                 masa = lista_valores[i][1]
+
+        error=0
         
-        if velocidad > c:
-            self.result_label.config(text="Error: La velocidad no puede ser mayor que la velocidad de la luz.")
-        else:
-            self.result_label.config(text=" ")
-            if tipo == "Plano":
-                densidad = float(self.densidad.get())
-                result = (epsilon_0 * masa * velocidad**2) / (carga * densidad)
-                self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: \n {result} m")
-                self.graficar_figura(tipo, result, 0)
+        try:
+            # Manejar excepciones si los campos están vacíos o no son números
+            if not par_tipo:
+                error = error+1
+            if par_tipo == "Personalizada":        
+                if not masa_:
+                    error = error+1
+                    if error > 0:
+                        raise ValueError("Por favor, ingrese los valores solicitados.")
+                    else:
+                        raise ValueError("Por favor, ingrese un valor para la masa.")
+                if not carga_:
+                    error = error+1
+                    if error > 0:
+                        raise ValueError("Por favor, ingrese un valor para la carga.")
+                    else:
+                        raise ValueError("Por favor, ingrese un valor para la carga.")
+            if not velocidad:
+                error = error+1
+                if error > 0:
+                    raise ValueError("Por favor, ingrese los valores solicitados.")
+                else:
+                    raise ValueError("Por favor, ingrese un valor para la velocidad.")
+            if  tipo == "Plano":
+                if not densidad_:
+                    error = error+1
+                    if error > 0:
+                        raise ValueError("Por favor, ingrese un valor para la densidad superficial de carga.")
+                    else:
+                        raise ValueError("Por favor, ingrese un valor para la densidad superficial de carga.")
+            if  tipo == "Esfera":
+                if not distancia_:
+                    error = error+1
+                    if error > 0:
+                        raise ValueError("Por favor, ingrese un valor para el radio de la esfera.")
+                    else:
+                        raise ValueError("Por favor, ingrese un valor para el radio de la esfera.")
+                if not carga_esfera_:
+                    error = error+1
+                    if error > 0:
+                        raise ValueError("Por favor, ingrese un valor para la carga de la esfera.")
+                    else:
+                        raise ValueError("Por favor, ingrese un valor para la carga de la esfera.")
+            if error > 0:
+                    raise ValueError("Por favor, seleccione una partícula.")
+            error=0
+            
+            masa = float(masa)
+            velocidad = float(velocidad)
+            carga = float(carga)
 
-            elif tipo == "Esfera":
-                distancia = float(self.distancia.get())
-                carga_esfera = float(self.carga_esfera.get())
-                result_velescape = 0.0
-                result_dismax = 0.0
-                result_velescape = math.sqrt((masa * carga * carga_esfera) / (math.pi * 2 * epsilon_0 * distancia))
-                result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
-                self.graficar_figura(tipo, result_dismax, distancia)
+            if velocidad > c:
+                self.result_label.config(text="Error: La velocidad no puede ser mayor que la velocidad de la luz.")
+            else:
+                self.result_label.config(text=" ")
+                if tipo == "Plano":
+                    densidad = float(densidad_)
+                    result = (epsilon_0 * masa * velocidad**2) / (carga * densidad)
+                    self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula: \n {result} m")
+                    self.graficar_figura(tipo, result, 0)
 
-                if result_velescape >= c:
-                    self.result_label.config(text=f"La esfera se ha convertido en un\n AGUJERO NEGRO ELECTROSTÁTICO,\n su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
+                elif tipo == "Esfera":
+                    distancia = float(distancia_)
+                    carga_esfera = float(carga_esfera_)
+                    result_velescape = 0.0
+                    result_dismax = 0.0
+                    result_velescape = math.sqrt((masa * carga * carga_esfera) / (math.pi * 2 * epsilon_0 * distancia))
+                    result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
+                    self.graficar_figura(tipo, result_dismax, distancia)
 
-                else: 
-                    self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula:\n {result_dismax} m\nVelocidad de escape de la partícula:\n {result_velescape} m/s")
+                    if result_velescape >= c:
+                        self.result_label.config(text=f"La esfera se ha convertido en un\n AGUJERO NEGRO ELECTROSTÁTICO,\n su velocidad de escape fue \n {result_velescape} m/s \nDistancia máxima de alejamiento de la partícula:\n {result_dismax} m")
 
+                    else: 
+                        self.result_label.config(text=f"Distancia máxima de alejamiento de la partícula:\n {result_dismax} m\nVelocidad de escape de la partícula:\n {result_velescape} m/s")
+
+        except ValueError as e:
+            # Manejar excepciones de valores faltantes o no válidos
+            error=0
+            self.result_label.config(text=str(e))
     
     def graficar_figura(self, tipo, distancia, radio):
         self.ax.clear()
