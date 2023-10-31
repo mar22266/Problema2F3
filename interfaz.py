@@ -220,8 +220,8 @@ class DataEntryFrame(tk.Frame):
                     carga_esfera = float(carga_esfera_)
                     result_velescape = 0.0
                     result_dismax = 0.0
-                    result_velescape = math.sqrt((carga * carga_esfera) / (math.pi * 2 * epsilon_0 * masa * velocidad))
-                    result_dismax = (2* math.pi* distancia**2 * epsilon_0* velocidad**2) / (carga * carga_esfera)
+                    result_velescape = math.sqrt((carga * carga_esfera) / (math.pi * 2 * epsilon_0 * masa * distancia))
+                    result_dismax = (carga * carga_esfera) / (2*math.pi*epsilon_0*masa*velocidad)
                     self.graficar_figura(tipo, result_dismax, distancia)
 
                     if result_velescape >= c:
