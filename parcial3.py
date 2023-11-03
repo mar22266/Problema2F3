@@ -2,10 +2,11 @@
 import math
 def calcular_densidad_particulas(material):
     #densidades recuperadas de internet
+    #duda de las densidades si esta bien o no
     densidades = {
         'oro': 19300,
         'plata': 10490,
-        'cobre': 8960,
+        'cobre': 8.49e28,
         'aluminio': 2700,
         'grafito': 2230,
     }
@@ -70,7 +71,7 @@ def calcular_potencia(voltaje, corriente):
 
 # Función para calcular la rapidez de arrastre de los electrones
 def calcular_rapidez_arrastre(corriente, densidad_particulas,diametro):
-    carga_elemental = 1.60219e-19  # Carga elemental en Coulombs
+    carga_elemental = 1.6e-19  # Carga elemental en Coulombs
     area = math.pi * (diametro / 2000) ** 2
     rapidez = corriente / (densidad_particulas * carga_elemental *area)
     return rapidez
@@ -118,6 +119,9 @@ def main():
     rapidez_arrastre = calcular_rapidez_arrastre(corriente, densidad_particulas,diametro_mm)
     tiempo_atravesar_alambre = calcular_tiempo(largo_alambre, rapidez_arrastre)
 
+    print()
+    print(f"--------Resumen de resultados:--------")
+    print()
     print(f"Valor de η (densidad de partículas) para {material}: {densidad_particulas}")
     print(f"Voltaje aplicado: {voltaje_aplicado}")
     print(f"Resistencia del alambre: {resistencia} ohmios")
