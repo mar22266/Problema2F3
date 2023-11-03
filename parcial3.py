@@ -1,11 +1,13 @@
 # Función para calcular el valor de η (densidad de partículas)
+import math
 def calcular_densidad_particulas(material):
+    #densidades recuperadas de internet
     densidades = {
-        'oro': 19.32,
-        'plata': 10.49,
-        'cobre': 8.96,
-        'aluminio': 2.70,
-        'grafito': 2.26,
+        'oro': 19300,
+        'plata': 10490,
+        'cobre': 8960,
+        'aluminio': 2700,
+        'grafito': 2230,
     }
     if material in densidades:
         return densidades[material]
@@ -13,29 +15,44 @@ def calcular_densidad_particulas(material):
         return None
 
 def obtener_resistividad(material):
+    # resistividades recuperadas del libro de fsica utilizado en el curso ( a temperatura ambiente 20°C)
     resistividades = {
         'oro': 2.44e-8,    # Ohmios por metro
-        'plata': 1.59e-8,  # Ohmios por metro
-        'cobre': 1.68e-8,  # Ohmios por metro
-        'aluminio': 2.82e-8,  # Ohmios por metro
-        'grafito': 1.00e-5,  # Ohmios por metro
+        'plata': 1.47e-8,  # Ohmios por metro
+        'cobre': 1.72e-8,  # Ohmios por metro
+        'aluminio': 2.75e-8,  # Ohmios por metro
+        'grafito': 3.5e-5,  # Ohmios por metro
     }
     if material in resistividades:
         return resistividades[material]
     else:
         return None
 
+
+def verificar_numero(cadena):
+    try:
+        float(cadena)  # Intenta convertir la cadena a un número decimal
+        if "." in cadena:
+            return "decimal"
+        else:
+            return "entero"
+    except ValueError:
+        return "no es un número"
+
 # Función para calcular el diámetro en mm a partir del calibre AWG
 def awg_a_mm(awg):
     return 0.127 * 92 ** ((36 - awg) / 39)
+
+# Función para calcular el calibre AWG a partir del diámetro en mm
+def mm_a_awg(mm):
+    return 36 - 39 * math.log(mm / 0.127) / math.log(92)
 
 # Función para calcular la resistencia del alambre
 def calcular_resistencia(largo, diametro, material):
     resistividad = obtener_resistividad(material)
     if resistividad is not None:
-        area = 3.14159 * (diametro / 2000) ** 2
+        area = math.pi * (diametro / 2000) ** 2
         resistencia = resistividad * (largo / area)
-        print(f"Resistencia calculada: {resistencia} ohmios")
         return resistencia
     else:
         return None
@@ -66,14 +83,26 @@ def calcular_tiempo(largo, rapidez):
 # Función principal
 def main():
     largo_alambre = float(input("Ingrese el largo del alambre en metros: "))
-    calibre = input("Ingrese el calibre (mm o AWG): ")
-    if calibre.isnumeric():
+    calibre = input("Ingresa un valor (calibre AWG o diámetro en mm) si es en AWG ingrese un entero si es en mm ingrese el valor con decimal: ")
+    
+    tipo = verificar_numero(calibre)
+    
+    if tipo == "decimal":
         diametro_mm = float(calibre)
-    elif calibre.isdigit():
-        diametro_mm = awg_a_mm(int(calibre))
+        calibre_awg = mm_a_awg(diametro_mm)
+        print()
+        print(f"El diámetro en mm es: {diametro_mm}")
+        print(f"El calibre AWG equivalente es: {calibre_awg}")
+        print()
+    elif tipo == "entero":
+        calibre_awg = int(calibre)
+        diametro_mm = awg_a_mm(calibre_awg)
+        print()
+        print(f"El calibre AWG es: {calibre_awg}")
+        print(f"El diámetro en mm equivalente es: {diametro_mm}")
+        print()
     else:
-        print("El calibre ingresado no es válido.")
-        return
+        print("El valor ingresado no es válido.")
 
     material = input("Ingrese el material del conductor (oro, plata, cobre, aluminio o grafito): ")
     densidad_particulas = calcular_densidad_particulas(material)
