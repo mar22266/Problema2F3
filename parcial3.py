@@ -71,7 +71,7 @@ def calcular_potencia(voltaje, corriente):
 # Función para calcular la rapidez de arrastre de los electrones
 def calcular_rapidez_arrastre(corriente, densidad_particulas,diametro):
     carga_elemental = 1.60219e-19  # Carga elemental en Coulombs
-    area = 3.14159 * (diametro / 2000) ** 2
+    area = math.pi * (diametro / 2000) ** 2
     rapidez = corriente / (densidad_particulas * carga_elemental *area)
     return rapidez
 
