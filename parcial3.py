@@ -8,6 +8,10 @@ import numpy as np
 import matplotlib.animation as animation
 from matplotlib.patches import Circle, Rectangle
 import random
+from colorama import Fore, Back, Style, init
+
+# Inicializa colorama para que funcione en sistemas Windows
+init()
 
 def calcular_densidad_particulas(material):
     #densidades recuperadas de internet
@@ -246,15 +250,26 @@ def main():
     tiempo_atravesar_alambre = calcular_tiempo(largo_alambre, rapidez_arrastre)
 
     print()
+    print(Fore.BLUE, end="")
     print(f"--------Resumen de resultados:--------")
     print()
-    print(f"Valor de η (densidad de partículas) para {material}: {densidad_particulas}")
-    print(f"Voltaje aplicado: {voltaje_aplicado}")
-    print(f"Resistencia del alambre: {resistencia} ohmios")
-    print(f"Corriente: {corriente} amperios")
-    print(f"Potencia disipada por el alambre: {potencia} vatios")
-    print(f"Rapidez de arrastre de los electrones: {rapidez_arrastre} m/s")
-    print(f"Tiempo que le tomará a los electrones atravesar el alambre: {tiempo_atravesar_alambre} segundos")
+    print(Style.RESET_ALL, end="")
+
+    # Establece el color verde para todo el bloque de texto
+    print(f"Valor de η (densidad de partículas) para {material}: {Fore.GREEN}{densidad_particulas}{Fore.RESET}")
+    print(f"Voltaje aplicado: {Fore.GREEN}{voltaje_aplicado} volts{Fore.RESET}")
+    print(f"Resistencia del alambre: {Fore.GREEN}{resistencia} ohmios{Fore.RESET} ")
+    print(f"Corriente: {Fore.GREEN}{corriente} amperios{Fore.RESET} ")
+    print(f"Potencia disipada por el alambre:  {Fore.GREEN}{potencia} vatios{Fore.RESET} ")
+    print(f"Rapidez de arrastre de los electrones:  {Fore.GREEN}{rapidez_arrastre} m/s{Fore.RESET}")
+    print(f"Tiempo que le tomará a los electrones atravesar el alambre:  {Fore.GREEN}{tiempo_atravesar_alambre} segundos{Fore.RESET}")
+    print(Style.RESET_ALL, end="")
+    print(Fore.BLUE, end="")
+    print()
+    print("---------------------------------------")
+    print(Style.RESET_ALL, end="")
+    print()
+    print()
     
     mostrar_animacion_electrones_aleatorios(largo_alambre=0.5, num_electrones=1, num_circulos=10)
     mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre)
