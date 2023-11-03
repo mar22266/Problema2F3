@@ -1,5 +1,10 @@
 # Función para calcular el valor de η (densidad de partículas)
 import math
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.animation as animation
+from matplotlib.patches import Circle, Rectangle
+
 def calcular_densidad_particulas(material):
     #densidades recuperadas de internet
     #duda de las densidades si esta bien o no
@@ -81,6 +86,62 @@ def calcular_tiempo(largo, rapidez):
     tiempo = largo / rapidez
     return tiempo
 
+
+
+
+# Función para mostrar una animación de los electrones y un cilindro a lo largo del alambre
+def mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre):
+    tiempo_total = largo_alambre / rapidez_arrastre  # Duración de la animación en segundos
+    num_electrones = 10  # Número de electrones para la animación
+    num_frames = 100  # Número de fotogramas para la animación
+
+    tiempo = np.linspace(0, tiempo_total, num_frames)
+    posiciones_electron = tiempo * rapidez_arrastre
+    posiciones_electron = posiciones_electron % largo_alambre  # Asegurar que los electrones no salgan del alambre
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.set_xlim(0, largo_alambre)
+    ax.set_ylim(-0.1, 0.1)
+    ax.set_xlabel("Posición en el alambre (metros)")
+    ax.set_title("Simulación de Movimiento de Electrones")
+    ax.grid(True)
+
+    electron_lines = []
+    textelectronvel = ax.text(0.05, 0.05, f'Rapidez de Arrastre: {rapidez_arrastre:.2f} m/s', transform=ax.transAxes)
+
+    for i in range(num_electrones):
+        electron_line, = ax.plot([], [], 'bo', markersize=10)
+        electron_lines.append(electron_line)
+
+    # Agregar un cilindro a lo largo del alambre
+    alambre_cilindrico = []
+    cilindro_radio = 0.05  # Radio del cilindro
+    cilindro_altura = 0.1  # Altura del cilindro
+
+    for x in np.arange(0, largo_alambre, cilindro_radio * 2):
+        cilindro = Rectangle((x, -cilindro_altura / 2), cilindro_radio * 2, cilindro_altura, fill=True, color='gray')
+        ax.add_patch(cilindro)
+        alambre_cilindrico.append(cilindro)
+
+    # Agregar círculos en los extremos del cilindro (negros)
+    cilindro_inicio = Circle((0, 0), cilindro_radio, fill=True, color='black')
+    ax.add_patch(cilindro_inicio)
+    cilindro_fin = Circle((largo_alambre, 0), cilindro_radio, fill=True, color='black')
+    ax.add_patch(cilindro_fin)
+
+    def init():
+        for line in electron_lines:
+            line.set_data([], [])
+        return electron_lines + [textelectronvel] + alambre_cilindrico + [cilindro_inicio, cilindro_fin]
+
+    def update(frame):
+        for i in range(num_electrones):
+            electron_lines[i].set_data(posiciones_electron[frame] + i * 0.1, 0)
+        textelectronvel.set_text(f'Rapidez de Arrastre: {rapidez_arrastre:.2f} m/s')
+        return electron_lines + [textelectronvel] + alambre_cilindrico + [cilindro_inicio, cilindro_fin]
+
+    ani = animation.FuncAnimation(fig, update, frames=num_frames, init_func=init, blit=True, repeat=False)
+    plt.show()
 # Función principal
 def main():
     largo_alambre = float(input("Ingrese el largo del alambre en metros: "))
@@ -129,6 +190,9 @@ def main():
     print(f"Potencia disipada por el alambre: {potencia} vatios")
     print(f"Rapidez de arrastre de los electrones: {rapidez_arrastre} m/s")
     print(f"Tiempo que le tomará a los electrones atravesar el alambre: {tiempo_atravesar_alambre} segundos")
+    mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre)
+
+
 
 if __name__ == "__main__":
     main()
