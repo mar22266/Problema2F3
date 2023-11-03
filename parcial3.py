@@ -1,9 +1,13 @@
 # Función para calcular el valor de η (densidad de partículas)
+#Problema 5 Parcial 3
+#Andre marroquin
+#Nelson Garcia
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 from matplotlib.patches import Circle, Rectangle
+import random
 
 def calcular_densidad_particulas(material):
     #densidades recuperadas de internet
@@ -142,6 +146,67 @@ def mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre):
 
     ani = animation.FuncAnimation(fig, update, frames=num_frames, init_func=init, blit=True, repeat=False)
     plt.show()
+
+
+def mostrar_animacion_electrones_aleatorios(largo_alambre, num_electrones, num_circulos):
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.set_xlim(0, largo_alambre)
+    ax.set_ylim(-0.1, 0.1)
+    ax.set_xlabel("Posición en el alambre (metros)")
+    ax.set_title("Simulación de Movimiento de Electrones Aleatorios")
+    ax.grid(True)
+
+    # Crear el cilindro
+    # Agregar un cilindro a lo largo del alambre
+    alambre_cilindrico = []
+    cilindro_radio = 0.05  # Radio del cilindro
+    cilindro_altura = 0.1  # Altura del cilindro
+
+    for x in np.arange(0, largo_alambre, cilindro_radio * 2):
+        cilindro = Rectangle((x, -cilindro_altura / 2), cilindro_radio * 2, cilindro_altura, fill=True, color='gray')
+        ax.add_patch(cilindro)
+        alambre_cilindrico.append(cilindro)
+
+    # Agregar círculos en los extremos del cilindro (negros)
+    cilindro_inicio = Circle((0, 0), cilindro_radio, fill=True, color='black')
+    ax.add_patch(cilindro_inicio)
+    cilindro_fin = Circle((largo_alambre, 0), cilindro_radio, fill=True, color='black')
+    ax.add_patch(cilindro_fin)
+
+    etiqueta = ax.text(0.02, 0.92, 'Círculos azules: Electrones\nCírculos rojos: Átomos', transform=ax.transAxes, fontsize=10,
+                       bbox={'facecolor': 'white', 'edgecolor': 'gray', 'alpha': 0.7})
+
+    # Crear los círculos rojos alrededor del cilindro
+    circulos = []
+    circulo_radio = 0.01
+    for i in range(num_circulos):
+        x = random.uniform(0, largo_alambre)
+        y = random.uniform(-0.05, 0.05)
+        circulo = Circle((x, y), circulo_radio, fill=True, color='red')
+        ax.add_patch(circulo)
+        circulos.append(circulo)
+
+    # Crear los electrones
+    electrones = []
+    for i in range(num_electrones):
+        x = random.uniform(0, largo_alambre)
+        y = random.uniform(-0.05, 0.05)
+        electron = plt.scatter(x, y, color='blue', s=50)
+        electrones.append(electron)
+
+    def init():
+        return circulos + electrones
+
+    def update(frame):
+        for electron in electrones:
+            # Mueve el electrón a un círculo aleatorio
+            circulo_destino = random.choice(circulos)
+            x, y = circulo_destino.center
+            electron.set_offsets([x, y])
+
+    ani = animation.FuncAnimation(fig, update, init_func=init, frames=100, interval=200, repeat=False)
+    plt.show()
+
 # Función principal
 def main():
     largo_alambre = float(input("Ingrese el largo del alambre en metros: "))
@@ -190,6 +255,8 @@ def main():
     print(f"Potencia disipada por el alambre: {potencia} vatios")
     print(f"Rapidez de arrastre de los electrones: {rapidez_arrastre} m/s")
     print(f"Tiempo que le tomará a los electrones atravesar el alambre: {tiempo_atravesar_alambre} segundos")
+    
+    mostrar_animacion_electrones_aleatorios(largo_alambre=0.5, num_electrones=1, num_circulos=10)
     mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre)
 
 
