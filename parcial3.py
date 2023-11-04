@@ -20,7 +20,7 @@ def calcular_densidad_particulas(material):
         'oro': 5.9e28,
         'plata': 5.8e28,
         'cobre': 8.5e28,
-        'aluminio': 2.2e29,
+        'aluminio': 6.0245e31,
         'grafito': 3.2421e30,
     }
     if material in densidades:
