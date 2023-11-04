@@ -18,7 +18,7 @@ def calcular_densidad_particulas(material):
     #duda de las densidades si esta bien o no
     densidades = {
         'oro': 19300,
-        'plata': 10490,
+        'plata': 5.8e28,
         'cobre': 8.49e28,
         'aluminio': 2700,
         'grafito': 2230,
