@@ -115,7 +115,7 @@ def mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre):
     ax.grid(True)
 
     electron_lines = []
-    textelectronvel = ax.text(0.05, 0.05, f'Rapidez de Arrastre: {rapidez_arrastre:.2f} m/s', transform=ax.transAxes)
+    textelectronvel = ax.text(0.05, 0.05, f'Rapidez de Arrastre: {rapidez_arrastre} m/s', transform=ax.transAxes)
 
     for i in range(num_electrones):
         electron_line, = ax.plot([], [], 'bo', markersize=10)
