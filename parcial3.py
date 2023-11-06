@@ -115,7 +115,7 @@ def mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre):
     ax.grid(True)
 
     electron_lines = []
-    textelectronvel = ax.text(0.05, 0.05, f'Rapidez de Arrastre: {rapidez_arrastre} m/s', transform=ax.transAxes)
+    textelectronvel = ax.text(0.05, 0.05, f'Rapidez de Arrastre: {rapidez_arrastre:.16f} m/s', transform=ax.transAxes)
 
     for i in range(num_electrones):
         electron_line, = ax.plot([], [], 'bo', markersize=10)
@@ -145,7 +145,7 @@ def mostrar_animacion_electrones_cilindro(largo_alambre, rapidez_arrastre):
     def update(frame):
         for i in range(num_electrones):
             electron_lines[i].set_data(posiciones_electron[frame] + i * 0.1, 0)
-        textelectronvel.set_text(f'Rapidez de Arrastre: {rapidez_arrastre:.2f} m/s')
+        textelectronvel.set_text(f'Rapidez de Arrastre: {rapidez_arrastre:.16f} m/s')
         return electron_lines + [textelectronvel] + alambre_cilindrico + [cilindro_inicio, cilindro_fin]
 
     ani = animation.FuncAnimation(fig, update, frames=num_frames, init_func=init, blit=True, repeat=False)
