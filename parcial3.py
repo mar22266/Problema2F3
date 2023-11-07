@@ -156,7 +156,7 @@ def mostrar_animacion_electrones_aleatorios(largo_alambre, num_electrones, num_c
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.set_xlim(0, largo_alambre)
     ax.set_ylim(-0.1, 0.1)
-    ax.set_xlabel("Posición en el alambre (metros)")
+    ax.set_xlabel("Posición en el alambre en metros (se muestra un pedazo del alambre)")
     ax.set_title("Simulación de Movimiento de Electrones Aleatorios")
     ax.grid(True)
 
