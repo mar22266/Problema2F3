@@ -15,13 +15,13 @@ init()
 
 def calcular_densidad_particulas(material):
     #densidades recuperadas de internet
-    #duda de las densidades si esta bien o no
+    
     densidades = {
         'oro': 5.9e28,
         'plata': 5.8e28,
         'cobre': 8.5e28,
         'aluminio': 1.808e28,
-        'grafito': 3.2421e30,
+        'grafito': 3.2421e30, #Densidad tomada de:"https://www.merckmillipore.com/GT/es/product/Graphite,MDA_CHEM-104206?ReferrerURL=https%3A%2F%2Fwww.google.com%2F" cada sitio de internet tiene una densidad diferente
     }
     if material in densidades:
         return densidades[material]
